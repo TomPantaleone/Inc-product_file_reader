@@ -27,6 +27,6 @@ productos= {
 "RUCULA X ATADO      ":30
 }
 
-def cant(prod_total_cell,cant_total_cell):
-    if prod_total_cell in productos:
-        print(str("\rcajones: ") + str(int(cant_total_cell / productos.get(prod_total_cell))))
+# def cant(prod_total_cell,cant_total_cell):
+#     if prod_total_cell in productos:
+#         print(str("\rcajones: ") + str(int(cant_total_cell / productos.get(prod_total_cell))))

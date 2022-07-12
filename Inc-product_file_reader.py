@@ -26,8 +26,13 @@ else:
     sheets = wb.sheetnames
     ws = wb[sheets[0]]
 
+# Abre el xlsx de pedidos_base
+wb_pedidos = openpyxl.load_workbook(pathfolder + "//listados//pedidos-base.xlsx")
+ws_pedidos = wb_pedidos.active
 
-# archivos_text("\listados\productos_listado.txt", "productos_aca")
+# # Abre el xlsx de pedidos_cantidad
+# wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//pedidos-cantidad.xlsx")
+# ws_cantidad = wb_pedidos.active
 
     ### No Hardcodear los archivos a buscar. Resolverlo con una funcion
 file = open(pathfolder + "\listados\productos_kilos.txt", "r")
@@ -51,22 +56,12 @@ contents = file.read()
 sucursales_aca = ast.literal_eval(contents)
 file.close()
 
-file = open(pathfolder + "/listados//remito.txt", "r")
-contents = file.read()
-remito = ast.literal_eval(contents)
-
 # Funciones
-def dict_cant(num_y,cant_var):                                         # Para poner totales de productos en los diccionarios (cajones y bultos)
-    for x,y in remito.items():
-        if x == prod_cell:
-            y[num_y] = cant_var
-
-def archivo_txt(nombre_archivo,listado):                        # Para crear .txt de los diccionarios
-    file_txt = open(pathfolder + nombre_archivo, "w")
-    for x,y in listado.items():
-        if y != [0,0]:
-            file_txt.write((x) + ":" + str(y) + "\n")
-    file_txt.close
+# def archivo_txt(nombre_archivo,listado):                        # Para crear .txt de los diccionarios
+#     file_txt = open(pathfolder + nombre_archivo, "w")
+#     for x,y in listado.items():
+#         file_txt.write((x) + ":" + str(y) + "\n")
+#     file_txt.close
 
 # Sacando datos para imprimir
 suc_value = 0
@@ -87,35 +82,54 @@ for cell in range (2, ws.max_row-1):
         bultos = 0  
 
         # A la lista "Remito" le aplica como values las cantidades de los productos (Que pasaron en el listado) - Solo saca capuchina
-        remito["ORDEN"] = oc_cell
-        remito["SUCURSAL"] = suc_cell       
-        dict_cant(0,cant_cell)
+        ws_pedidos["B1"] = suc_cell
+        ws_pedidos["B2"] = oc_cell
 
         # Saca las cantidades finales (Cajones) - Solo
         if prod_cell in productos:
             prod_div = int((cant_cell / productos.get(prod_cell)))
             bultos += prod_div
             list_prod[prod_cell] += prod_div
-        dict_cant(1,prod_div)
     # Saca cantidad (Archivo) de todos los productos
-    else:
-        dict_cant(0,cant_cell)
+            for numero_pedido in range (1, ws_pedidos.max_row-1):
+                prod_pedidos = ws_pedidos["A" + str(numero_pedido)].value
+                if prod_pedidos == prod_cell:
+                    ws_pedidos["B" + str(numero_pedido)] = cant_cell
+                    ws_pedidos["C" + str(numero_pedido)] = prod_div
 
+    else:
         if prod_cell in productos:
             prod_div = int((cant_cell / productos.get(prod_cell)))
             bultos += prod_div
             list_prod[prod_cell] += prod_div
-        dict_cant(1,prod_div)
+            for numero_pedido in range (1, ws_pedidos.max_row-1):
+                prod_pedidos = ws_pedidos["A" + str(numero_pedido)].value
+                if prod_pedidos == prod_cell:
+                    ws_pedidos["B" + str(numero_pedido)] = cant_cell
+                    ws_pedidos["C" + str(numero_pedido)] = prod_div
 
         if suc_cell != ws["A" + str(cell+1)].value:
-            remito["BULTOS"] = bultos
-            archivo_txt(("/pedidos//sucursal_" + str(suc_cell) + ".txt"),remito)
-            remito = ast.literal_eval(contents)
-
+            ws_pedidos["C26"] = bultos
+            wb_pedidos.save(pathfolder + "//pedidos//sucursal_" + str(suc_cell) + ".xlsx")
+            wb_pedidos = openpyxl.load_workbook(pathfolder + "//listados//pedidos-base.xlsx")
+            ws_pedidos = wb_pedidos.active
 
     suc_value = suc_cell
 
-archivo_txt("/pedidos//cantidad_aca.txt",productos_aca)
-archivo_txt("/pedidos//cantidad_ifco.txt",productos_ifco)
+wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//pedidos-cantidad.xlsx")
+ws_cantidad = wb_cantidad.active
+for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
+    nomb_pedidos = ws_cantidad["A" + str(cantidad_pedidos)].value
+    for x,y in productos_aca.items():
+        if x == nomb_pedidos and y != 0:
+            ws_cantidad["B" + str(cantidad_pedidos)] = y
+    for x,y in productos_ifco.items():
+        if x == nomb_pedidos and y != 0:
+            ws_cantidad["C" + str(cantidad_pedidos)] = y
+wb_cantidad.save(pathfolder + "//pedidos//cantidad.xlsx")
+wb_cantidad.close()
+
+# archivo_txt("/pedidos//cantidad_aca.txt",productos_aca)
+# archivo_txt("/pedidos//cantidad_ifco.txt",productos_ifco)
 file.close()
 wb.close()
