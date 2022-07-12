@@ -14,6 +14,10 @@ workdir = os.chdir(filefolder)
 fileinc = os.listdir()[0]
 fileinc_ext = os.path.splitext(fileinc)
 
+# Borrar archivos de la carpeta "pedidos"
+for files in os.listdir(pathfolder + "\\pedidos\\"):
+    os.remove(pathfolder + "\\pedidos\\" + files)
+
 # Si el archivo es .xls, guardarlo como .xlsx y abrirlo. Si no lo es, abrirlo
 if fileinc_ext[1] == ".xls":
     fileinc_ext2 = fileinc_ext[0] + "2.xlsx"
@@ -29,10 +33,6 @@ else:
 # Abre el xlsx de pedidos_base
 wb_pedidos = openpyxl.load_workbook(pathfolder + "//listados//pedidos-base.xlsx")
 ws_pedidos = wb_pedidos.active
-
-# # Abre el xlsx de pedidos_cantidad
-# wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//pedidos-cantidad.xlsx")
-# ws_cantidad = wb_pedidos.active
 
     ### No Hardcodear los archivos a buscar. Resolverlo con una funcion
 file = open(pathfolder + "\listados\productos_kilos.txt", "r")
@@ -55,13 +55,6 @@ file = open(pathfolder + "\listados\sucursales_aca.txt", "r")
 contents = file.read()
 sucursales_aca = ast.literal_eval(contents)
 file.close()
-
-# Funciones
-# def archivo_txt(nombre_archivo,listado):                        # Para crear .txt de los diccionarios
-#     file_txt = open(pathfolder + nombre_archivo, "w")
-#     for x,y in listado.items():
-#         file_txt.write((x) + ":" + str(y) + "\n")
-#     file_txt.close
 
 # Sacando datos para imprimir
 suc_value = 0
@@ -129,7 +122,5 @@ for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
 wb_cantidad.save(pathfolder + "//pedidos//cantidad.xlsx")
 wb_cantidad.close()
 
-# archivo_txt("/pedidos//cantidad_aca.txt",productos_aca)
-# archivo_txt("/pedidos//cantidad_ifco.txt",productos_ifco)
 file.close()
 wb.close()
