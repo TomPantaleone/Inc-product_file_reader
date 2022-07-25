@@ -75,8 +75,8 @@ for cell in range (2, ws.max_row-1):
         bultos = 0  
 
         # A la lista "Remito" le aplica como values las cantidades de los productos (Que pasaron en el listado) - Solo saca capuchina
-        ws_pedidos["B1"] = suc_cell
-        ws_pedidos["B2"] = oc_cell
+        ws_pedidos["D1"] = oc_cell
+        ws_pedidos["D2"] = suc_cell
 
         # Saca las cantidades finales (Cajones) - Solo
         if prod_cell in productos:
@@ -85,10 +85,10 @@ for cell in range (2, ws.max_row-1):
             list_prod[prod_cell] += prod_div
     # Saca cantidad (Archivo) de todos los productos
             for numero_pedido in range (1, ws_pedidos.max_row-1):
-                prod_pedidos = ws_pedidos["A" + str(numero_pedido)].value
+                prod_pedidos = ws_pedidos["C" + str(numero_pedido)].value
                 if prod_pedidos == prod_cell:
                     ws_pedidos["B" + str(numero_pedido)] = cant_cell
-                    ws_pedidos["C" + str(numero_pedido)] = prod_div
+                    ws_pedidos["F" + str(numero_pedido)] = prod_div
 
     else:
         if prod_cell in productos:
@@ -96,29 +96,29 @@ for cell in range (2, ws.max_row-1):
             bultos += prod_div
             list_prod[prod_cell] += prod_div
             for numero_pedido in range (1, ws_pedidos.max_row-1):
-                prod_pedidos = ws_pedidos["A" + str(numero_pedido)].value
+                prod_pedidos = ws_pedidos["C" + str(numero_pedido)].value
                 if prod_pedidos == prod_cell:
                     ws_pedidos["B" + str(numero_pedido)] = cant_cell
-                    ws_pedidos["C" + str(numero_pedido)] = prod_div
+                    ws_pedidos["F" + str(numero_pedido)] = prod_div
 
         if suc_cell != ws["A" + str(cell+1)].value:
-            ws_pedidos["C26"] = bultos
+            ws_pedidos["F31"] = bultos
             wb_pedidos.save(pathfolder + "//pedidos//sucursal_" + str(suc_cell) + ".xlsx")
             wb_pedidos = openpyxl.load_workbook(pathfolder + "//listados//pedidos-base.xlsx")
             ws_pedidos = wb_pedidos.active
 
     suc_value = suc_cell
 
-wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//pedidos-cantidad.xlsx")
+wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//pedidos-base.xlsx")
 ws_cantidad = wb_cantidad.active
 for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
-    nomb_pedidos = ws_cantidad["A" + str(cantidad_pedidos)].value
+    nomb_pedidos = ws_cantidad["C" + str(cantidad_pedidos)].value
     for x,y in productos_aca.items():
         if x == nomb_pedidos and y != 0:
-            ws_cantidad["B" + str(cantidad_pedidos)] = y
+            ws_cantidad["F" + str(cantidad_pedidos)] = y
     for x,y in productos_ifco.items():
         if x == nomb_pedidos and y != 0:
-            ws_cantidad["C" + str(cantidad_pedidos)] = y
+            ws_cantidad["G" + str(cantidad_pedidos)] = y
 wb_cantidad.save(pathfolder + "//pedidos//cantidad.xlsx")
 wb_cantidad.close()
 
