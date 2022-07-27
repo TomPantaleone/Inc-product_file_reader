@@ -7,6 +7,7 @@ from multiprocessing.sharedctypes import Value
 import os, openpyxl
 import pyexcel as p
 import ast
+import PySimpleGUI as sg     
 
 pathfolder = (os.path.dirname(__file__))
 filefolder = (pathfolder + "\\archivos\\")
@@ -56,6 +57,35 @@ contents = file.read()
 sucursales_aca = ast.literal_eval(contents)
 file.close()
 
+# Ventana 
+layout = [[sg.Text('Elejir que productos no se van a contabilizar')],      
+            [sg.Checkbox("Acelga", key="ACELGA X PAQUETE      ")],      
+            [sg.Checkbox("Radicheta", key="RADICHETA X ATADO      ")],   
+            [sg.Checkbox("Lechuga Francesa", key="LECHUGA FRANCESA X KG.      ")],
+            [sg.Checkbox("Rabanito", key="RABANITO X ATADO.      ")],
+            [sg.Checkbox("Lechuga morada", key="LECHUGA MORADA X KG.      ")],
+            [sg.Checkbox("Lechuga criolla", key="LECHUGA CRIOLLA x kg.      ")],
+            [sg.Checkbox("Espinaca", key="ESPINACA X ATADO      ")],
+            [sg.Checkbox("Perejil", key="PEREJIL X ATADO      ")],
+            [sg.Checkbox("Puerro", key="PUERRO X ATADO      ")],   
+            [sg.Checkbox("Remolacha", key="REMOLACHA X KG.      ")],
+            [sg.Checkbox("Albahaca", key="ALBAHACA X ATADO      ")],
+            [sg.Checkbox("Coliflor", key="COLIFLOR x kg.      ")],
+            [sg.Checkbox("Brocoli", key="BROCOLI x kg.      ")],
+            [sg.Checkbox("Escarola ancha", key="LECHUGA ESCAROLA X KG      ")],
+            [sg.Checkbox("Hinojo", key="HINOJO X KG.      ")],
+            [sg.Checkbox("Lechuga Capuchina", key="LECHUGA CAPUCHINA X KG      ")],
+            [sg.Checkbox("Lechuga Mantecosa", key="LECHUGA MANTECOSA X KG.      ")],
+            [sg.Checkbox("Cebolla de verdeo", key="CEBOLLA DE VERDEO X ATADO      ")],
+            [sg.Checkbox("Apio", key="APIO X KG.      ")],
+            [sg.Checkbox("Akusay", key="AKUSAY X KG      ")],
+            [sg.Checkbox("Repollo colorado", key="REPOLLO COLORADO X KG.      ")],
+            [sg.Checkbox("Repollo blanco", key="REPOLLO BLANCO x kg.-      ")],
+            [sg.Checkbox("Rucula", key="RUCULA X ATADO      ")],
+            [sg.Submit("Aceptar"), sg.Cancel("Salir")]]      
+
+window = sg.Window('automatizador de pedidos', layout)
+
 # Sacando datos para imprimir
 suc_value = 0
 for cell in range (2, ws.max_row-1):
@@ -63,6 +93,21 @@ for cell in range (2, ws.max_row-1):
     oc_cell = (ws["B" + str(cell)].value)               # OC data
     prod_cell = (ws["H" + str(cell)].value)             # Producto data
     cant_cell = (ws["I" + str(cell)].value)             # Cantidad data
+
+    # if prod_cell not in productos_aca.keys() and productos_ifco.keys():
+    #     continue
+    # while True:
+    #     event, values = window.read() 
+    #     print(values)
+    #     if event == "Aceptar":
+    #         for x,y in values.items():
+    #             if y == True:
+    #                 if x in productos_aca.keys():
+    #                     productos_aca.pop(x)
+    #                     productos_ifco.pop(x)
+    #     elif event == sg.WIN_CLOSED or event == "Salir":
+    #         break
+    #     window.close()
 
     # Chequea si la sucursal tiene productos en ifco o aca y los pone en distintas listas
     if suc_cell == None:
@@ -79,7 +124,7 @@ for cell in range (2, ws.max_row-1):
         ws_pedidos["B2"] = oc_cell
 
         # Saca las cantidades finales (Cajones) - Solo
-        if prod_cell in productos:
+        if prod_cell in productos_aca.keys() and productos_ifco.keys():
             prod_div = int((cant_cell / productos.get(prod_cell)))
             bultos += prod_div
             list_prod[prod_cell] += prod_div
@@ -91,7 +136,7 @@ for cell in range (2, ws.max_row-1):
                     ws_pedidos["C" + str(numero_pedido)] = prod_div
 
     else:
-        if prod_cell in productos:
+        if prod_cell in productos_aca.keys() and productos_ifco.keys():
             prod_div = int((cant_cell / productos.get(prod_cell)))
             bultos += prod_div
             list_prod[prod_cell] += prod_div
@@ -101,11 +146,11 @@ for cell in range (2, ws.max_row-1):
                     ws_pedidos["B" + str(numero_pedido)] = cant_cell
                     ws_pedidos["C" + str(numero_pedido)] = prod_div
 
-        if suc_cell != ws["A" + str(cell+1)].value:
-            ws_pedidos["C26"] = bultos
-            wb_pedidos.save(pathfolder + "//pedidos//sucursal_" + str(suc_cell) + ".xlsx")
-            wb_pedidos = openpyxl.load_workbook(pathfolder + "//listados//pedidos-base.xlsx")
-            ws_pedidos = wb_pedidos.active
+    if suc_cell != ws["A" + str(cell+1)].value:
+        ws_pedidos["C26"] = bultos
+        wb_pedidos.save(pathfolder + "//pedidos//sucursal_" + str(suc_cell) + ".xlsx")
+        wb_pedidos = openpyxl.load_workbook(pathfolder + "//listados//pedidos-base.xlsx")
+        ws_pedidos = wb_pedidos.active
 
     suc_value = suc_cell
 
