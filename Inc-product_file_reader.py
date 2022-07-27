@@ -19,6 +19,8 @@ fileinc_ext = os.path.splitext(fileinc)
 for files in os.listdir(pathfolder + "\\pedidos\\"):
     os.remove(pathfolder + "\\pedidos\\" + files)
 
+# Archivos donde van a estar los pedidos
+
 # Si el archivo es .xls, guardarlo como .xlsx y abrirlo. Si no lo es, abrirlo
 if fileinc_ext[1] == ".xls":
     fileinc_ext2 = fileinc_ext[0] + "2.xlsx"
@@ -82,9 +84,28 @@ layout = [[sg.Text('Elejir que productos no se van a contabilizar')],
             [sg.Checkbox("Repollo colorado", key="REPOLLO COLORADO X KG.      ")],
             [sg.Checkbox("Repollo blanco", key="REPOLLO BLANCO x kg.-      ")],
             [sg.Checkbox("Rucula", key="RUCULA X ATADO      ")],
+            [sg.Checkbox("Imprimir Pedidos", default=True, key="Print")],
             [sg.Submit("Aceptar"), sg.Cancel("Salir")]]      
 
 window = sg.Window('automatizador de pedidos', layout)
+
+# Variable para imprimir archivos
+imprimir_pedidos = False
+
+while True:
+    event, values = window.read() 
+    if event == "Aceptar":
+        for x,y in values.items():
+            if y == True:
+                if x in productos_aca.keys():
+                    productos_aca.pop(x)
+                    productos_ifco.pop(x)
+            if x == "Print" and y == True:
+                imprimir_pedidos = True
+        break
+    elif event == sg.WIN_CLOSED or event == "Salir":
+        exit()
+window.close()
 
 # Sacando datos para imprimir
 suc_value = 0
@@ -93,21 +114,6 @@ for cell in range (2, ws.max_row-1):
     oc_cell = (ws["B" + str(cell)].value)               # OC data
     prod_cell = (ws["H" + str(cell)].value)             # Producto data
     cant_cell = (ws["I" + str(cell)].value)             # Cantidad data
-
-    # if prod_cell not in productos_aca.keys() and productos_ifco.keys():
-    #     continue
-    # while True:
-    #     event, values = window.read() 
-    #     print(values)
-    #     if event == "Aceptar":
-    #         for x,y in values.items():
-    #             if y == True:
-    #                 if x in productos_aca.keys():
-    #                     productos_aca.pop(x)
-    #                     productos_ifco.pop(x)
-    #     elif event == sg.WIN_CLOSED or event == "Salir":
-    #         break
-    #     window.close()
 
     # Chequea si la sucursal tiene productos en ifco o aca y los pone en distintas listas
     if suc_cell == None:
@@ -166,6 +172,12 @@ for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
             ws_cantidad["C" + str(cantidad_pedidos)] = y
 wb_cantidad.save(pathfolder + "//pedidos//cantidad.xlsx")
 wb_cantidad.close()
+
+# Imprimir archivos con checkbox
+if imprimir_pedidos == True:
+    os.chdir(pathfolder + "\\pedidos\\")
+    for files in os.listdir():
+        os.startfile(files, "print")
 
 file.close()
 wb.close()
