@@ -11,7 +11,7 @@
 "REMOLACHA X KG.      ":10,
 "ALBAHACA X ATADO      ":25,
 "COLIFLOR x kg.      ":8,
-"BROCOLI x kg.      ":8,
+"BROCOLI x kg.      ":6,
 "LECHUGA ESCAROLA X KG      ":5,
 "HINOJO X KG.      ":10,
 "LECHUGA CAPUCHINA X KG      ":8,
