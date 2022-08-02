@@ -30,14 +30,6 @@ sucursal = {
 "RUCULA X ATADO      ":23
 }
 
-# print("type producto: ")
-# prod = input()
-
-# for x,y in sucursal.items():
-#     if x == prod:
-#         continue
-#     print(x + " : " + str(y))
-
 ### ---- window screen
 layout = [[sg.Text('Elejir que productos no se van a contabilizar')],      
             [sg.Checkbox("Acelga", key="ACELGA X PAQUETE      ")],      
@@ -80,5 +72,5 @@ while True:
     elif event == sg.WIN_CLOSED or event == "Salir":
         break
 
-window.close()
+    window.close()
 
