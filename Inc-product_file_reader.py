@@ -2,7 +2,7 @@
 #! Inc-product_file_reader.py
 #! File that reads a .xls and sorts info in differents lists.
 
-import os, openpyxl, pyexcel_xls
+import os, openpyxl
 from tkinter import CENTER
 import pyexcel as p
 import ast
@@ -18,7 +18,6 @@ fileinc_ext = os.path.splitext(fileinc)
 for files in os.listdir(pathfolder + "\\pedidos\\"):
     os.remove(pathfolder + "\\pedidos\\" + files)
 # Archivos donde van a estar los pedidos
-
 # Si el archivo es .xls, guardarlo como .xlsx y abrirlo. Si no lo es, abrirlo
 if fileinc_ext[1] == ".xls":
     fileinc_ext2 = fileinc_ext[0] + "2.xlsx"
