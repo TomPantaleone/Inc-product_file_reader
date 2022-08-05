@@ -2,9 +2,7 @@
 #! Inc-product_file_reader.py
 #! File that reads a .xls and sorts info in differents lists.
 
-# from fileinput import close
-# from multiprocessing.sharedctypes import Value
-import os, openpyxl
+import os, openpyxl, pyexcel_xls
 from tkinter import CENTER
 import pyexcel as p
 import ast
