@@ -55,6 +55,11 @@ contents = file.read()
 sucursales_aca = ast.literal_eval(contents)
 file.close()
 
+file = open(pathfolder + "\listados\sucursales_locacion.txt", "r")
+contents = file.read()
+sucursales_locacion = ast.literal_eval(contents)
+file.close()
+
 # Ventana 
 layout = [[sg.Text('Elejir que productos NO se van a contabilizar')],      
             [sg.Checkbox("Acelga", key="ACELGA X PAQUETE      ", size =(14,1)), sg.Checkbox("Puerro", key="PUERRO X ATADO      ", size =(14,1)), sg.Checkbox("Lechuga Mantecosa", key="LECHUGA MANTECOSA X KG.      ", size =(14,1))], 
@@ -67,7 +72,7 @@ layout = [[sg.Text('Elejir que productos NO se van a contabilizar')],
             [sg.Checkbox("Perejil", key="PEREJIL X ATADO      ", size =(14,1)), sg.Checkbox("Lechuga Capuchina", key="LECHUGA CAPUCHINA X KG      ", size =(14,1))],
             [sg.Text("-"*90, size=(60,1), justification= CENTER)],
             [sg.Text("Seleccionar si quiere imprimir los pedidos")],
-            [sg.Checkbox("Imprimir Pedidos", default=True, key="Print")],
+            [sg.Checkbox("Imprimir Pedidos", key="Print")],
             [sg.Submit("Aceptar"), sg.Cancel("Salir")]]      
 
 window = sg.Window('Automatizador de pedidos', layout)
@@ -110,6 +115,9 @@ for cell in range (2, ws.max_row-1):
 
         # A la lista "Remito" le aplica como values las cantidades de los productos (Que pasaron en el listado) - Solo saca capuchina
         ws_pedidos["D2"] = suc_cell
+        for x in sucursales_locacion.items():
+            if suc_cell == x[0]:
+                ws_pedidos["F1"] = x[1]
         ws_pedidos["D1"] = oc_cell
 
         # Saca las cantidades finales (Cajones) - Solo
@@ -145,7 +153,7 @@ for cell in range (2, ws.max_row-1):
 
     suc_value = suc_cell
 
-wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//pedidos.xlsx")
+wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//cantidades.xlsx")
 ws_cantidad = wb_cantidad.active
 for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
     nomb_pedidos = ws_cantidad["C" + str(cantidad_pedidos)].value
