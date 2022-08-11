@@ -7,6 +7,7 @@ from tkinter import CENTER
 import pyexcel as p
 import ast
 import PySimpleGUI as sg     
+import sys
 
 pathfolder = (os.path.dirname(__file__))
 filefolder = (pathfolder + "\\archivos\\")
@@ -92,11 +93,12 @@ while True:
                 imprimir_pedidos = True
         break
     elif event == sg.WIN_CLOSED or event == "Salir":
-        exit()
+        sys.exit()
 window.close()
 
 # Sacando datos para imprimir
 suc_value = 0
+oc_value = 0
 for cell in range (2, ws.max_row-1):
     suc_cell = ws["A" + str(cell)].value                # Suc data
     oc_cell = (ws["B" + str(cell)].value)               # OC data
@@ -106,14 +108,14 @@ for cell in range (2, ws.max_row-1):
     # Chequea si la sucursal tiene productos en ifco o aca y los pone en distintas listas
     if suc_cell == None:
         continue
-    elif suc_cell != suc_value:
+    elif oc_cell != oc_value or suc_cell != suc_value:
         if suc_cell in sucursales_aca:
             list_prod = productos_aca
         else:
             list_prod = productos_ifco
         bultos = 0  
 
-        # A la lista "Remito" le aplica como values las cantidades de los productos (Que pasaron en el listado) - Solo saca capuchina
+        # Le pone la variable "sucursal_locacion" a los .xslx, para que sepa el nombre de la sucursal.
         ws_pedidos["D2"] = suc_cell
         for x in sucursales_locacion.items():
             if suc_cell == x[0]:
@@ -143,18 +145,21 @@ for cell in range (2, ws.max_row-1):
                     ws_pedidos["B" + str(numero_pedido)] = cant_cell
                     ws_pedidos["F" + str(numero_pedido)] = prod_div
 
-    if suc_cell != ws["A" + str(cell+1)].value:
+    if oc_cell != ws["B" + str(cell+1)].value or suc_cell != ws["A" + str(cell+1)].value:
         ws_pedidos["F31"] = bultos
         if bultos == 0:
             continue
-        wb_pedidos.save(pathfolder + "//pedidos//sucursal_" + str(suc_cell) + ".xlsx")
+        wb_pedidos.save(pathfolder + "//pedidos//sucursal_" + str(suc_cell) + "_orden_" + str(oc_cell) + ".xlsx")
         wb_pedidos = openpyxl.load_workbook(pathfolder + "//listados//pedidos.xlsx")
         ws_pedidos = wb_pedidos.active
 
+    oc_value = oc_cell
     suc_value = suc_cell
 
-wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//cantidades.xlsx")
+wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//pedidos.xlsx")
 ws_cantidad = wb_cantidad.active
+ws_cantidad["C1"].value = ""
+ws_cantidad["C2"].value = ""
 for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
     nomb_pedidos = ws_cantidad["C" + str(cantidad_pedidos)].value
     for x,y in productos_aca.items():
