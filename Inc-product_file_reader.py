@@ -3,6 +3,7 @@
 #! File that reads a .xls and sorts info in differents lists.
 
 import os, openpyxl
+from openpyxl.styles.borders import Border, Side
 from tkinter import CENTER
 import pyexcel as p
 import ast
@@ -30,6 +31,20 @@ else:
     wb = openpyxl.load_workbook(fileinc)
     sheets = wb.sheetnames
     ws = wb[sheets[0]]
+
+# Max cell row + 5 crea un borde, para que pueda leer todo el archivo correctamente. Guarda .xlsx y vuelve a abrir
+thin_border = Border(left=Side(style='thin'), 
+                     right=Side(style='thin'), 
+                     top=Side(style='thin'), 
+                     bottom=Side(style='thin'))
+
+ws.cell(row= ws.max_row+5, column=1).border = thin_border
+wb.save("pedidos_generados.xlsx")
+wb.close()
+
+wb = openpyxl.load_workbook("pedidos_generados.xlsx")
+sheets = wb.sheetnames
+ws = wb[sheets[0]]
 
 # Abre el xlsx de pedidos_base
 wb_pedidos = openpyxl.load_workbook(pathfolder + "//listados//pedidos.xlsx")
