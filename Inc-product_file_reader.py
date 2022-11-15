@@ -2,7 +2,8 @@
 #! Inc-product_file_reader.py
 #! File that reads a .xls and sorts info in differents lists.
 
-import os, openpyxl
+import os, openpyxl, shutil
+from os import path
 from openpyxl.styles.borders import Border, Side
 from tkinter import CENTER
 import pyexcel as p
@@ -16,9 +17,10 @@ workdir = os.chdir(filefolder)
 fileinc = os.listdir()[0]
 fileinc_ext = os.path.splitext(fileinc)
 
-# Borrar archivos de la carpeta "pedidos"
+# Borrar arbol de directorio de la carpeta "pedidos"
 for files in os.listdir(pathfolder + "\\pedidos\\"):
-    os.remove(pathfolder + "\\pedidos\\" + files)
+    shutil.rmtree(pathfolder + "//pedidos//" + files)
+
 # Archivos donde van a estar los pedidos
 # Si el archivo es .xls, guardarlo como .xlsx y abrirlo. Si no lo es, abrirlo
 if fileinc_ext[1] == ".xls":
@@ -111,6 +113,15 @@ while True:
         sys.exit()
 window.close()
 
+# Crear carpetas con fecha
+for cell in range (2, ws.max_row-1):
+    date_cell = ws["E" + str(cell)].value
+    if path.exists(pathfolder + "//pedidos//" + date_cell):
+        break
+    else:
+        os.mkdir(pathfolder + "//pedidos//" + date_cell)
+
+
 # Sacando datos para imprimir
 suc_value = 0
 oc_value = 0
@@ -164,14 +175,15 @@ for cell in range (2, ws.max_row-1):
         ws_pedidos["F31"] = bultos
         if bultos == 0:
             continue
-        wb_pedidos.save(pathfolder + "//pedidos//sucursal_" + str(suc_cell) + "_orden_" + str(oc_cell) + ".xlsx")
-        wb_pedidos = openpyxl.load_workbook(pathfolder + "//listados//pedidos.xlsx")
+        #wb_pedidos.save(pathfolder + "//pedidos//" + date_cell + "//sucursal_" + str(suc_cell) + "_orden_" + str(oc_cell) + ".xlsx")
+        wb_pedidos.save(f"{pathfolder}//pedidos//{date_cell}//sucursal_{str(suc_cell)}_orden_{str(oc_cell)}.xlsx")
+        wb_pedidos = openpyxl.load_workbook(f"{pathfolder}//listados//pedidos.xlsx")
         ws_pedidos = wb_pedidos.active
 
     oc_value = oc_cell
     suc_value = suc_cell
 
-wb_cantidad = openpyxl.load_workbook(pathfolder + "//listados//pedidos.xlsx")
+wb_cantidad = openpyxl.load_workbook(f"{pathfolder}//listados//pedidos.xlsx")
 ws_cantidad = wb_cantidad.active
 ws_cantidad["C1"].value = ""
 ws_cantidad["C2"].value = ""
@@ -183,7 +195,7 @@ for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
     for x,y in productos_ifco.items():
         if x == nomb_pedidos and y != 0:
             ws_cantidad["G" + str(cantidad_pedidos)] = y
-wb_cantidad.save(pathfolder + "//pedidos//cantidad.xlsx")
+wb_cantidad.save(f"{pathfolder}//pedidos//{date_cell}//cantidad.xlsx")
 wb_cantidad.close()
 
 # Imprimir archivos con checkbox
