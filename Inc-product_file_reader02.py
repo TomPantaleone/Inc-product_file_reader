@@ -130,11 +130,11 @@ for cell in range (2, ws.max_row-1):
 suc_value = 0
 oc_value = 0
 for cell in range (2, ws.max_row-1):
-    suc_cell = ws["A" + str(cell)].value                # Suc data
+    suc_cell = ws["A" + str(cell)].value              # Suc data
     oc_cell = ws["B" + str(cell)].value               # OC data
     prod_cell = ws["H" + str(cell)].value             # Producto data
     cant_cell = ws["I" + str(cell)].value             # Cantidad data
-    date_cell = ws["E" + str(cell)].value               # Fecha data
+    date_cell = ws["E" + str(cell)].value             # Fecha data
 
     # Chequea si la sucursal tiene productos en ifco o aca y los pone en distintas listas
     if suc_cell == None:
