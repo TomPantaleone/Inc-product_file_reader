@@ -2,14 +2,17 @@
 #! Inc-product_file_reader.py
 #! File that reads a .xls and sorts info in differents lists.
 
-import os, openpyxl, shutil
-from os import path
-from openpyxl.styles.borders import Border, Side
-from tkinter import CENTER
-import pyexcel as p
 import ast
-import PySimpleGUI as sg     
+import os
+import shutil
 import sys
+from os import path
+from tkinter import CENTER
+
+import openpyxl
+import pyexcel as p
+import PySimpleGUI as sg
+from openpyxl.styles.borders import Border, Side
 
 pathfolder = (os.path.dirname(__file__))
 filefolder = (pathfolder + "\\archivos\\")
@@ -140,10 +143,6 @@ for cell in range (2, ws.max_row-1):
     if suc_cell == None:
         continue
     elif oc_cell != oc_value or suc_cell != suc_value:
-        if suc_cell in sucursales_aca:
-            list_prod = productos_aca
-        else:
-            list_prod = productos_ifco
         bultos = 0  
 
         # Le pone la variable "sucursal_locacion" a los .xslx, para que sepa el nombre de la sucursal.
@@ -157,8 +156,7 @@ for cell in range (2, ws.max_row-1):
         if prod_cell in productos_aca.keys() and productos_ifco.keys():
             prod_div = int((cant_cell / productos.get(prod_cell)))
             bultos += prod_div
-            list_prod[prod_cell] += prod_div
-    # Saca cantidad (Archivo) de todos los productos
+        # Saca cantidad (Archivo) de todos los productos
             for numero_pedido in range (1, ws_pedidos.max_row-1):
                 prod_pedidos = ws_pedidos["C" + str(numero_pedido)].value
                 if prod_pedidos == prod_cell:
@@ -169,7 +167,6 @@ for cell in range (2, ws.max_row-1):
         if prod_cell in productos_aca.keys() and productos_ifco.keys():
             prod_div = int((cant_cell / productos.get(prod_cell)))
             bultos += prod_div
-            list_prod[prod_cell] += prod_div
             for numero_pedido in range (1, ws_pedidos.max_row-1):
                 prod_pedidos = ws_pedidos["C" + str(numero_pedido)].value
                 if prod_pedidos == prod_cell:
@@ -181,32 +178,70 @@ for cell in range (2, ws.max_row-1):
         if bultos == 0:
             continue
         wb_pedidos.save(f"{pathfolder}//pedidos//{date_cell}//sucursal_{str(suc_cell)}_orden_{str(oc_cell)}.xlsx")
-        wb_pedidos = openpyxl.load_workbook(f"{pathfolder}//listados//pedidos.xlsx")
-        ws_pedidos = wb_pedidos.active
 
     oc_value = oc_cell
     suc_value = suc_cell
 
-wb_cantidad = openpyxl.load_workbook(f"{pathfolder}//listados//pedidos.xlsx")
-ws_cantidad = wb_cantidad.active
-ws_cantidad["C1"].value = ""
-ws_cantidad["C2"].value = ""
-for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
-    nomb_pedidos = ws_cantidad["C" + str(cantidad_pedidos)].value
-    for x,y in productos_aca.items():
-        if x == nomb_pedidos and y != 0:
-            ws_cantidad["F" + str(cantidad_pedidos)] = y
-    for x,y in productos_ifco.items():
-        if x == nomb_pedidos and y != 0:
-            ws_cantidad["G" + str(cantidad_pedidos)] = y
-wb_cantidad.save(f"{pathfolder}//pedidos//{date_cell}//cantidad.xlsx")
-wb_cantidad.close()
+#wb_cantidad = openpyxl.load_workbook(f"{pathfolder}//listados//pedidos.xlsx")
+#ws_cantidad = wb_cantidad.active
+#ws_cantidad["C1"].value = ""
+#ws_cantidad["C2"].value = ""
+#for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
+#    nomb_pedidos = ws_cantidad["C" + str(cantidad_pedidos)].value
+#    for x,y in productos_aca.items():
+#        if x == nomb_pedidos and y != 0:
+#            ws_cantidad["F" + str(cantidad_pedidos)] = y
+#    for x,y in productos_ifco.items():
+#        if x == nomb_pedidos and y != 0:
+#            ws_cantidad["G" + str(cantidad_pedidos)] = y
+#wb_cantidad.save(f"{pathfolder}//pedidos//{date_cell}//cantidad.xlsx")
+#wb_cantidad.close()
+
+# Saca las cantidades totales de cada dia.
+for folders in os.listdir(f"{pathfolder}//pedidos"):
+    for files in os.listdir(f"{pathfolder}//pedidos//{folders}"):
+#        print(files)
+        wb_sumatoria = openpyxl.load_workbook(f"{pathfolder}//pedidos//{folders}//{files}")
+        ws_sumatoria = wb_sumatoria.active
+        # Verifica la sucursal si es "aca" o "ifco"
+        suc_cell = ws_sumatoria["D2"].value
+        if suc_cell in sucursales_aca:
+            list_prod = productos_aca
+#            print(f"{list_prod} aca")
+        else:
+            list_prod = productos_ifco
+#            print(f"{list_prod} ifco")
+        # Saca los valores de cada archivo y se lo asigna a la lista correspondiente ("Aca" o "ifco")
+        for cell in range(2,ws_sumatoria.max_row-1):
+            prod_cell = ws_sumatoria["C" + str(cell)].value             # Producto data (archivo final)
+            cant_cell = ws_sumatoria["F" + str(cell)].value             # Cantidad data (archivo final)
+            if prod_cell in productos_aca.keys() and productos_ifco.keys():
+                if cant_cell == None:
+                    continue
+                else:
+                    list_prod[prod_cell] += cant_cell
+
+    wb_cantidad = openpyxl.load_workbook(f"{pathfolder}//listados//pedidos.xlsx")
+    ws_cantidad = wb_cantidad.active
+    ws_cantidad["C1"].value = ""
+    ws_cantidad["C2"].value = ""
+    for cantidad_pedidos in range (1, ws_cantidad.max_row-1):
+        nomb_pedidos = ws_cantidad["C" + str(cantidad_pedidos)].value
+        for x,y in productos_aca.items():
+            if x == nomb_pedidos and y != 0:
+                ws_cantidad["F" + str(cantidad_pedidos)] = y
+        for x,y in productos_ifco.items():
+            if x == nomb_pedidos and y != 0:
+                ws_cantidad["G" + str(cantidad_pedidos)] = y
+    wb_cantidad.save(f"{pathfolder}\\pedidos\\{folders}\\cantidad.xlsx")
+    wb_cantidad.close()
 
 # Imprimir archivos con checkbox
 if imprimir_pedidos == True:
-    os.chdir(pathfolder + "\\pedidos\\")
-    for files in os.listdir():
-        os.startfile(files, "print")
+    for root, dirs, files in os.walk(f"{pathfolder}\\pedidos"):
+        for file_pedido in files:
+            os.startfile(f"{root}//{file}", "print")
 
 file.close()
-wb.close()
+wb_sumatoria.close()
+wb_cantidad.close()
